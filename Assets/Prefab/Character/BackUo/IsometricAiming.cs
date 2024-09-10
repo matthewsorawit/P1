@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace BarthaSzabolcs.IsometricAiming
 {
@@ -20,10 +21,10 @@ namespace BarthaSzabolcs.IsometricAiming
 
         #region Private Fields
 
-        
+
         private Camera mainCamera;
         private float nextShootTime = 0f;
-        AudioManager audioManager;
+
         #endregion
 
         #endregion
@@ -31,10 +32,7 @@ namespace BarthaSzabolcs.IsometricAiming
         #region Methods
 
         #region Unity Callbacks
-        private void Awake()
-        {
-            audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
-        }
+
         private void Start()
         {
             mainCamera = Camera.main;
@@ -43,24 +41,32 @@ namespace BarthaSzabolcs.IsometricAiming
 
         private void Update()
         {
+            // ตรวจสอบว่าเมาส์คลิกอยู่บน UI หรือไม่
+            if (EventSystem.current.IsPointerOverGameObject())
+                return; // ไม่ทำงานหากเมาส์อยู่บน UI
+
             if (Input.GetMouseButton(0) && Time.time >= nextShootTime)
             {
-                audioManager.PlaySFX(audioManager.shoot);
                 Shoot();
                 nextShootTime = Time.time + shootRate;
             }
-            
         }
 
         #endregion
 
         private void Shoot()
         {
+            // ตรวจสอบว่าเมาส์คลิกอยู่บน UI หรือไม่
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                Debug.Log("Click detected on UI");
+                return; // ไม่ทำงานหากเมาส์อยู่บน UI
+            }
+
             var (hitEnemy, hitPosition) = GetMouseClickTarget();
-            
+
             if (hitEnemy)
             {
-                audioManager.PlaySFX(audioManager.Hit);
                 Debug.Log("Enemy hit!");
             }
             else
@@ -81,6 +87,7 @@ namespace BarthaSzabolcs.IsometricAiming
             }
         }
 
+
         private (bool hitEnemy, Vector3 position) GetMouseClickTarget()
         {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -89,7 +96,7 @@ namespace BarthaSzabolcs.IsometricAiming
             {
                 return (hitEnemy: true, position: enemyHitInfo.point);
             }
-            
+
             if (Physics.Raycast(ray, out var groundHitInfo, Mathf.Infinity, groundMask))
             {
                 return (hitEnemy: false, position: groundHitInfo.point);
@@ -104,3 +111,4 @@ namespace BarthaSzabolcs.IsometricAiming
         #endregion
     }
 }
+
