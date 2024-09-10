@@ -13,11 +13,15 @@ public class Enemy : MonoBehaviour
     private Rigidbody rb;
 
     public AudioSource hitSound;
+    AudioManager audioManager;
     public GameObject hitEffectPrefab;
 
     public event Action<GameObject> OnEnemyDestroyed;
 
-    
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     private void Start()
     {
@@ -91,6 +95,7 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        audioManager.PlaySFX(audioManager.zombiedeath);
         Debug.Log("Enemy has died.");
         ScoreManager.scoreValue += 1;
         Destroy(gameObject);
