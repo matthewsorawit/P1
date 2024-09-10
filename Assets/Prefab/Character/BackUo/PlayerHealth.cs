@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;  // สำหรับการจัดการ Scene
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -31,7 +32,9 @@ public class PlayerHealth : MonoBehaviour
         // Check if the player's health has dropped to zero or below
         if (playerHealth <= 0)
         {
+            
             Die();
+            
         }
     }
 
@@ -40,6 +43,8 @@ public class PlayerHealth : MonoBehaviour
         // Logic for the player dying
         audioManager.PlaySFX(audioManager.death);
         Debug.Log("Player has died.");
-        Destroy(gameObject); // Destroy the player GameObject
+
+        // Load the Game Over scene
+        SceneManager.LoadScene("GameOver");  // แทนการ Destroy ผู้เล่น, โหลดหน้า Game Over
     }
 }
